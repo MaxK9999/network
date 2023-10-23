@@ -114,6 +114,38 @@ def edit_post(request, post_id):
         })
 
 
+@csrf_exempt
+@login_required
+def create_comment(request, post_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        content = data.get('content')
+        image = request.FILES.get('image')
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({
+                "message": "Post not found"
+            })
+        
+        if content or image:
+            comment = Comment(user=request.user, post=post, content=content)
+            if image:
+                comment.image = image
+            comment.save()
+            return JsonResponse({
+                "message": "Comment created succesfully"
+            })
+        else:
+            return JsonResponse({
+                "message": "Comment content is missing"
+            })
+    return JsonResponse({
+        "message": "POST request required"
+    })
+    
+
 def all_posts(request):
     posts = Post.objects.all().order_by('-timestamp')
     return render(request, 'index.html', {
