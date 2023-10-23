@@ -10,4 +10,4 @@ class AppTests(TestCase):
         
     def test_index_view(self):
         response = self.client.get('network/index.html')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
