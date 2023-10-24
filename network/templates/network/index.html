@@ -5,7 +5,7 @@
 
     <div id="container-post">
         <h5>Share your thoughts...</h5>
-        <form action="post" id="post-form">
+        <form action="{% url 'new_post' %}" id="post-form" method="POST">
             <textarea id="post-content" onclick="autoExpand(this)"></textarea><br>
             <input type="file" id="post-image" accept="image/*">
             <button id="post-button">Post</button>
@@ -15,7 +15,7 @@
     <div id="post-list">
     </div>
 
-    
+
 {% endblock %}
 
 {% block script %}
