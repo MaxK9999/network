@@ -14,4 +14,35 @@ nav {
 
 body {
     background-color: rgba(243, 239, 239, 0.904);
+
+    #container-post {
+        background-color: rgb(216, 215, 215);
+        padding: 20px;
+        max-width: fit-content;
+        flex-wrap: wrap;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0 0 18px;
+        border-bottom: 1px solid rgba(170, 170, 170, 0.589);
+        border-right: 1px solid rgba(170, 170, 170, 0.589);
+
+        h5 {
+            margin-left: 20px;
+        }
+
+        #post-content{
+            border-radius: 40px;
+            padding: 10px;
+            height: 45px;
+            width: 250px;
+            resize: none;
+            background-color: rgba(255, 255, 255, 0.74);
+            overflow-y: hidden;
+            transition: height 0.4s;
+            &:hover {
+                background-color: rgba(231, 231, 231, 0.74);
+            }
+        }
+    }
 }
+

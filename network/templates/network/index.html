@@ -1,5 +1,23 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+
+    <div id="container-post">
+        <h5>Share your thoughts...</h5>
+        <form action="post" id="post-form">
+            <textarea id="post-content" onclick="autoExpand(this)"></textarea><br>
+            <input type="file" id="post-image" accept="image/*">
+            <button id="post-button">Post</button>
+        </form>
+    </div>
+    
+    <div id="post-list">
+    </div>
+
+    
 {% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/script.js' %}"></script>
+{% endblock  %}
