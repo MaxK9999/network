@@ -21,7 +21,15 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name="liked_posts", blank=True, null=True)
     comments = models.ManyToManyField(Comment, related_name="post_comments", blank=True, null=True)
     
-    def __str__(self):
-        return f"Post {self.id} made by {self.user}"
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user": self.user,
+            "body": self.body,
+            "image": self.image,
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "likes": self.likes,
+            "comments": self.comments,
+        }
     
     
