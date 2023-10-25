@@ -6,7 +6,7 @@
     <div id="container-post">
         <h5>Share your thoughts...</h5>
         <form action="{% url 'new_post' %}" id="post-form" method="POST">
-            <textarea id="post-content" onclick="autoExpand(this)"></textarea><br>
+            <textarea id="post-content" rows="1" cols="10"></textarea><br>
             <input type="file" id="post-image" accept="image/*">
             <button id="post-button">Post</button>
         </form>

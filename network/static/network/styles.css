@@ -38,8 +38,14 @@ body #container-post #post-content {
   resize: none;
   background-color: rgba(255, 255, 255, 0.74);
   overflow-y: hidden;
-  transition: height 0.4s;
+  transition: all 0.4s ease;
+  outline: none;
+  box-shadow: none;
 }
 body #container-post #post-content:hover {
   background-color: rgba(231, 231, 231, 0.74);
+}
+body #container-post #post-content:focus {
+  height: 250px;
+  padding: 20px;
 }/*# sourceMappingURL=styles.css.map */
