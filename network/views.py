@@ -71,12 +71,12 @@ def register(request):
 def new_post(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        body = data.get('body')
-        if body:
+        content = data.get('content')
+        if content:
             user = request.user
             post = Post.objects.create(
                 user=user,
-                body=body,
+                body=content,
             )
             return JsonResponse({
                 "message": "Post created succesfully!"

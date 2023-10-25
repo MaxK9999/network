@@ -3,14 +3,21 @@
 
 {% block body %}
 
+    {% if user.is_authenticated %}
     <div id="container-post">
         <h5>Share your thoughts...</h5>
         <form action="{% url 'new_post' %}" id="post-form" method="POST">
+            {% csrf_token %}
             <textarea id="post-content" rows="1" cols="10"></textarea><br>
-            <input type="file" id="post-image" accept="image/*">
+            <label for="post-image" class="custom-file-upload">
+                <input type="file" id="post-image" accept="image/*">
+                <i class="fa-regular fa-file-image fa-xl"></i>
+            </label>
             <button id="post-button">Post</button>
         </form>
     </div>
+    {% endif %}
+    
     
     <div id="post-list">
     </div>

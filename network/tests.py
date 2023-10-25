@@ -12,8 +12,8 @@ class AppTests(TestCase):
     
     # Test index view
     def test_index_view(self):
-        response = self.client.get('network/index.html')
-        self.assertEqual(response.status_code, 404) # Change this to 200 when index has been completed to actually view it
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
         
     
     # Test whether posts can be created

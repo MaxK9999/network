@@ -29,6 +29,7 @@ body #container-post {
 }
 body #container-post h5 {
   margin-left: 20px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 body #container-post #post-content {
   border-radius: 40px;
@@ -48,4 +49,35 @@ body #container-post #post-content:hover {
 body #container-post #post-content:focus {
   height: 250px;
   padding: 20px;
+}
+body #container-post label {
+  background-color: rgba(243, 243, 243, 0.796);
+  border: 1px solid rgba(151, 151, 151, 0.867);
+  border-radius: 16px;
+  transition: all 0.4s ease;
+}
+body #container-post label:hover {
+  background-color: aquamarine;
+  transform: scale(1.1);
+}
+body #container-post label input[type=file] {
+  display: none;
+}
+body #container-post label i {
+  padding: 20px;
+}
+body #container-post #post-button {
+  border-radius: 16px;
+  border: 1px solid rgba(151, 151, 151, 0.867);
+  padding: 9px;
+  width: 60px;
+  margin-top: 8px;
+  margin-left: 10px;
+  transition: all 0.4s ease;
+  outline: none;
+  box-shadow: none;
+}
+body #container-post #post-button:hover {
+  background-color: rgba(59, 235, 255, 0.827);
+  transform: scale(1.1);
 }/*# sourceMappingURL=styles.css.map */
