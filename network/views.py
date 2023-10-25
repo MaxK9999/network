@@ -1,4 +1,4 @@
-import json
+import json, logging
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -69,8 +69,10 @@ def register(request):
 @csrf_exempt
 @login_required
 def new_post(request):
+    logger = logging.getLogger(__name__)
     if request.method == "POST":
         data = json.loads(request.body)
+        logger.info(f"Received data: {data}")
         content = data.get('content')
         if content:
             user = request.user
@@ -79,8 +81,8 @@ def new_post(request):
                 body=content,
             )
             return JsonResponse({
-                "message": "Post created succesfully!"
-                })
+                "message": "Post created successfully!"
+            })
         else:
             return JsonResponse({
                 "message": "Cannot post an empty message."
@@ -89,6 +91,7 @@ def new_post(request):
         return JsonResponse({
             "message": "POST request required"
         })
+
 
 
 @csrf_exempt
