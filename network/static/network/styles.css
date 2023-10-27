@@ -47,6 +47,7 @@ body #container-post #post-content:hover {
   background-color: rgba(231, 231, 231, 0.74);
 }
 body #container-post #post-content:focus {
+  transition: none;
   height: 250px;
   padding: 20px;
 }

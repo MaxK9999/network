@@ -1,8 +1,9 @@
-import json, logging
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
+from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -69,88 +70,39 @@ def register(request):
 @csrf_exempt
 @login_required
 def new_post(request):
-    logger = logging.getLogger(__name__)
-    if request.method == "POST":
-        data = json.loads(request.body)
-        logger.info(f"Received data: {data}")
-        content = data.get('content')
-        if content:
-            user = request.user
-            post = Post.objects.create(
-                user=user,
-                body=content,
-            )
-            return JsonResponse({
-                "message": "Post created successfully!"
-            })
-        else:
-            return JsonResponse({
-                "message": "Cannot post an empty message."
-            })
-    else:
+    if request.method != "POST":
         return JsonResponse({
-            "message": "POST request required"
+            "message": "Request method must be POST!"
         })
-
-
-
-@csrf_exempt
-@login_required
-def edit_post(request, post_id):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        new_body = data.get('body')
-        post = Post.objects.get(pk=post_id)
-        if post.user == request.user and new_body:
-            post.body = new_body
-            post.save()
-            return JsonResponse({
-                "message": "Post edited succesfully."
-            })
-        else:
-            return JsonResponse({
-                "message": "Permission denied and/or body content is missing."
-            })
-    else:
-        return JsonResponse({
-            "message": "Post request required!"
-        })
-
-
-@csrf_exempt
-@login_required
-def create_comment(request, post_id):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        content = data.get('content')
-        image = request.FILES.get('image')
-
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return JsonResponse({
-                "message": "Post not found"
-            })
-        
-        if content or image:
-            comment = Comment(user=request.user, post=post, content=content)
-            if image:
-                comment.image = image
-            comment.save()
-            return JsonResponse({
-                "message": "Comment created succesfully"
-            })
-        else:
-            return JsonResponse({
-                "message": "Comment content is missing"
-            })
+    
     return JsonResponse({
-        "message": "POST request required"
+        "message": "Post created succesfully!"
     })
     
 
-def all_posts(request):
-    posts = Post.objects.all().order_by('-timestamp')
-    return render(request, 'index.html', {
-        'posts': posts
-    })
+def load_posts(request):
+    posts = Post.objects.annotate(like_count=F('liked_by')).order_by('-timestamp')
+    
+    post_data = [{
+            "id": post.id,
+            "user": post.user,
+            "body": post.body,
+            "image": post.image,
+            "timestamp": post.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "liked_by": [user.username for user in post.liked_by.all()],
+            "comments": post.comments,
+    } for post in posts]
+    
+    return JsonResponse(post_data, safe=False)
+
+
+@csrf_exempt
+@login_required
+def edit_post(request):
+    pass
+
+
+@csrf_exempt 
+@login_required
+def create_comment(request):
+    pass
