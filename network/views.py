@@ -1,5 +1,7 @@
 import json
+from tkinter import Pack
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
@@ -75,15 +77,35 @@ def new_post(request):
             "message": "Request method must be POST!"
         })
     
+    user = request.user
+    body = request.POST.get("body")
+    image = request.POST.get("image")
+    
+    post = Post(user=user, body=body, image=image)
+    post.save()
+    
     return JsonResponse({
         "message": "Post created succesfully!"
     })
     
 
 def load_posts(request):
-    posts = Post.objects.annotate(like_count=F('liked_by')).order_by('-timestamp')
+    posts = Post.objects.select_related('user').prefetch_related('liked_by').order_by('-timestamp')
+
+    items_per_page = 10
+    paginator = Paginator(posts, items_per_page)
+    page = request.GET.get('page')
     
-    post_data = [{
+    try:
+        posts_page = paginator.page(page)
+    except PageNotAnInteger:
+        posts_page = paginator.page(1)
+    except EmptyPage:
+        posts_page = paginator.page(paginator.num_pages)
+    
+    post_data= []
+    for post in posts_page:
+        post_item = {
             "id": post.id,
             "user": post.user,
             "body": post.body,
@@ -91,9 +113,13 @@ def load_posts(request):
             "timestamp": post.timestamp.strftime("%b %d %Y, %I:%M %p"),
             "liked_by": [user.username for user in post.liked_by.all()],
             "comments": post.comments,
-    } for post in posts]
+        }
+        post_data.append(post_item)
     
-    return JsonResponse(post_data, safe=False)
+    return JsonResponse({
+        "posts": post_data,
+        "has_next": posts_page.has_next(),
+        })
 
 
 @csrf_exempt
