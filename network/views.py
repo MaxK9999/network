@@ -1,11 +1,9 @@
 import json
-from tkinter import Pack
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
-from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -84,9 +82,7 @@ def new_post(request):
     post = Post(user=user, body=body, image=image)
     post.save()
     
-    return JsonResponse({
-        "message": "Post created succesfully!"
-    })
+    return redirect("index")
     
 
 def load_posts(request):
@@ -107,7 +103,7 @@ def load_posts(request):
     for post in posts_page:
         post_item = {
             "id": post.id,
-            "user": post.user,
+            "user": post.user.username,
             "body": post.body,
             "image": post.image,
             "timestamp": post.timestamp.strftime("%b %d %Y, %I:%M %p"),
