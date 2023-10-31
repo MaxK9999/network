@@ -35,5 +35,5 @@ class Post(models.Model):
             "image": self.image,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
             "liked_by": [user.username for user in self.liked_by.all()],
-            "comments": self.comments,
+            "comments": [comment.serialize() for comment in self.comments.all()],
         }

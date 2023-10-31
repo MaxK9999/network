@@ -1,6 +1,7 @@
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
@@ -12,7 +13,9 @@ from .models import User, Post, Comment
 
 
 def index(request):
-    return render(request, "network/index.html")
+    return render(request, "network/index.html", {
+        "posts": Post.objects.all().order_by('-timestamp').all()	
+    })
 
 
 def login_view(request):
@@ -66,14 +69,14 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-
+    
 @csrf_exempt
 @login_required
 def new_post(request):
     if request.method != "POST":
         return JsonResponse({
             "message": "Request method must be POST!"
-        })
+        }, status=405)
     
     user = request.user
     body = request.POST.get("body")
@@ -82,41 +85,39 @@ def new_post(request):
     post = Post(user=user, body=body, image=image)
     post.save()
     
-    return redirect("index")
+    return JsonResponse({
+        "message": "Post created successfully!",
+        "post": {
+            "user": user.username,
+            "body": body,
+            "timestamp": post.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "liked_by": [],
+            "comments": []
+        }
+    })
     
 
 def load_posts(request):
-    posts = Post.objects.select_related('user').prefetch_related('liked_by').order_by('-timestamp')
-
-    items_per_page = 10
-    paginator = Paginator(posts, items_per_page)
-    page = request.GET.get('page')
-    
-    try:
-        posts_page = paginator.page(page)
-    except PageNotAnInteger:
-        posts_page = paginator.page(1)
-    except EmptyPage:
-        posts_page = paginator.page(paginator.num_pages)
-    
-    post_data= []
-    for post in posts_page:
-        post_item = {
-            "id": post.id,
-            "user": post.user.username,
-            "body": post.body,
-            "image": post.image,
-            "timestamp": post.timestamp.strftime("%b %d %Y, %I:%M %p"),
-            "liked_by": [user.username for user in post.liked_by.all()],
-            "comments": post.comments,
-        }
-        post_data.append(post_item)
-    
-    return JsonResponse({
-        "posts": post_data,
-        "has_next": posts_page.has_next(),
+    posts = Post.objects.all()
+    post_data = []
+    for post in posts:
+        comments = []
+        for comment in post.comments.all():
+            comments.append({
+                'id': comment.id,
+                'text': comment.body,
+                'timestamp': str(comment.timestamp),
+                'author': comment.user.username,
+            })
+        post_data.append({
+            'id': post.id,
+            'text': post.body,
+            'timestamp': str(post.timestamp),
+            'author': post.user.username,
+            'comments': comments,
         })
-
+    posts = posts.order_by('-timestamp').all()
+    return JsonResponse(post_data, safe=False)
 
 @csrf_exempt
 @login_required

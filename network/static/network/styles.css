@@ -47,7 +47,7 @@ body #container-post #post-content:hover {
   background-color: rgba(231, 231, 231, 0.74);
 }
 body #container-post #post-content:focus {
-  transition: none;
+  transition: all 0.4s ease;
   height: 250px;
   padding: 20px;
 }
@@ -81,4 +81,14 @@ body #container-post #post-button {
 body #container-post #post-button:hover {
   background-color: rgba(59, 235, 255, 0.827);
   transform: scale(1.1);
+}
+body #post-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(170, 170, 170, 0.589);
+  background-color: rgb(185, 130, 130);
+  padding: 10px;
+}
+body #post-list .post-item {
+  margin-bottom: 10px;
 }/*# sourceMappingURL=styles.css.map */
