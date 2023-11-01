@@ -13,9 +13,7 @@ from .models import User, Post, Comment
 
 
 def index(request):
-    return render(request, "network/index.html", {
-        "posts": Post.objects.all().order_by('-timestamp').all()	
-    })
+    return render(request, "network/index.html")
 
 
 def login_view(request):
@@ -80,11 +78,10 @@ def new_post(request):
     
     user = request.user
     body = request.POST.get("body")
-    image = request.POST.get("image")
     
-    post = Post(user=user, body=body, image=image)
+    post = Post(user=user, body=body)
     post.save()
-    
+        
     return JsonResponse({
         "message": "Post created successfully!",
         "post": {
@@ -96,9 +93,20 @@ def new_post(request):
         }
     })
     
+    
 
-def load_posts(request):
-    posts = Post.objects.all()
+def get_posts(request):
+    posts = Post.objects.all().order_by("-timestamp")
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+    try:
+        posts = paginator.page(page_number)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
     post_data = []
     for post in posts:
         comments = []
@@ -115,10 +123,18 @@ def load_posts(request):
             'timestamp': str(post.timestamp),
             'author': post.user.username,
             'comments': comments,
+            'liked_by': [user.username for user in post.liked_by.all()],
         })
-    posts = posts.order_by('-timestamp').all()
-    return JsonResponse(post_data, safe=False)
+        
+    return JsonResponse({
+        'posts': post_data,
+        'num_pages': paginator.num_pages,
+        'page': page_number,
+        'has_next': posts.has_next(),
+        'has_previous': posts.has_previous(),
+    }, safe=True)
 
+    
 @csrf_exempt
 @login_required
 def edit_post(request):

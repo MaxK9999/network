@@ -1,39 +1,3 @@
-// Fetch posts from views.py and load them into the DOM as a Single Page Application
-// when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/load_posts')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            const postList = document.getElementById('post-list');
-            if (!data.posts) {
-                console.log('No posts found');
-                return;
-            }
-            try {
-                data.posts.forEach(post => {
-                    console.log(post);
-                    const postItem = document.createElement('div');
-                    postItem.className = 'post-item';
-                    postItem.innerHTML = `
-                        <p><strong>${post.author}</strong></p>
-                        <p>${post.text}</p>
-                        <p>${post.timestamp}</p>
-                        <p>Liked by: ${post.liked_by.join(', ')}</p>
-                        <p>Comments: ${post.comments}</p>
-                    `;
-                    console.log(postItem);
-                    postList.appendChild(postItem);
-                });
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        })
-});
-
 // Form submission
 // Make sure that the form submits a new post to the top of the load_posts view
 // when it is submitted by the user
@@ -58,8 +22,41 @@ postForm.addEventListener('submit', function(event) {
                     <p>Liked by: ${data.post.liked_by.join(', ')}</p>
                     <p>Comments: ${data.post.comments}</p>
                 `;
-                postList.appendChild(postItem);
+                postList.insertBefore(postItem, postList.firstChild);
             }
-            console.log("Post has been submitted!");
+            console.log("Post has been submitted");
+            const textarea = document.getElementById('post-content');
+            textarea.value = '';
         });
 }); 
+
+// Function to fetch and display all posts from server
+const postsUrl = '/get_posts';
+function fetchAndDisplayPosts() {
+    fetch(postsUrl)
+        .then(response => response.json())
+        .then(data => {
+            const postList = document.getElementById('post-list');
+
+            data.posts.forEach(post => {
+                const postItem = document.createElement('div');
+                postItem.className = 'post-item';
+                postItem.innerHTML = `
+                    <p><strong>${post.author}</strong></p>
+                    <p>${post.text}</p>
+                    <p>${post.timestamp}</p>
+                    <p>Liked by: ${post.liked_by.join(', ')}</p>
+                    <p>Comments: ${post.comments.length}</p>
+                `;
+                postList.appendChild(postItem);
+            });
+
+            // Add pagination controls if needed
+            // You can check data.num_pages, data.page, data.has_next, and data.has_previous
+        })
+        .catch(error => {
+            console.error('Error fetching and displaying posts:', error);
+        });
+}
+
+fetchAndDisplayPosts();

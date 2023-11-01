@@ -18,17 +18,7 @@
     </div>
     {% endif %}
     
-    <div id="post-list"> 
-        {% for post in posts %}
-            <div class="post-item">
-                <p><strong>{{ post.user }}</strong></p>
-                <p>{{ post.body }}</p>
-                <p>{{ post.timestamp }}</p>
-                <p>Liked by: {{ post.liked_by }}</p>
-                <p>Comments: {{ post.comments }}</p>
-            </div>
-        {% endfor %}
-    </div>
+    <div id="post-list"></div>
 
     <script src="{% static 'network/script.js' %}">
 
