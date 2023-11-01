@@ -4,9 +4,15 @@ from django.db import models
 
 
 class User(AbstractUser):
+    username = models.CharField(max_length=150, unique=True)
+    followers = models.ManyToManyField('self', related_name="following_users", blank=True)
+    following = models.ManyToManyField('self', related_name="followers_users", blank=True)
+    bio = models.TextField(max_length=500, blank=True)
+    website = models.URLField(max_length=200, blank=True)
+    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     likes = models.ManyToManyField('Post', related_name="liking_users", blank=True)
     comments = models.ManyToManyField('Comment', related_name="commented_by", blank=True)
-    posts = models.ManyToManyField('Post', related_name="posted_by")
+    posts = models.ManyToManyField('Post', related_name="posted_by", blank=True)	
 
 
 class Comment(models.Model):
@@ -28,6 +34,8 @@ class Post(models.Model):
     liked_by = models.ManyToManyField(User, related_name="liked_posts", blank=True)
     comments = models.ManyToManyField(Comment, related_name="post_comments", blank=True)
     
+    def formatted_timestamp(self):
+        return self.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S")
     def serialize(self):
         
         return {
@@ -35,7 +43,7 @@ class Post(models.Model):
             "user": self.user,
             "body": self.body,
             "image": self.image,
-            "timestamp": self.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
+            "timestamp": self.formatted_timestamp(),
             "liked_by": [user.username for user in self.liked_by.all()],
             "comments": [comment.serialize() for comment in self.comments.all()],
         }

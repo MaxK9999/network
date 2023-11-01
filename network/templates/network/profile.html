@@ -2,7 +2,49 @@
 {% load static %}
 
 {% block body %}
-    
+
+    <section id="profile-page">
+
+        <div id="profile">
+            <h1>{{ user.username }}</h1>
+            {% if user != request.user %}
+                <form action="{% url 'profile_page' user.username %}" method="post">
+                    {% csrf_token %}
+                    {% if is_following %}
+                        <button type="submit" name="unfollow">Unfollow</button>
+                    {% else %}
+                        <button type="submit" name="follow">Follow</button>
+                    {% endif %}
+                </form>
+            {% endif %}
+            <p>{{ user.bio }}</p>
+            <div class="profile-details">
+                <p><a href="{{ user.website }}">{{ user.website }}</a></p>
+                <p>Followers: {{ user.followers.count }}</p>
+                <p>Following: {{ user.following.count }}</p>
+            </div>
+        </div>
+
+        <div id="all-posts">
+            <h2>All Posts</h2>
+            <div id="posts-container">
+                <div id="post-list">
+                    {% for post in user_posts %}
+                        <div class="post-item">
+                            <p class="post-author"><strong>{{ post.user }}</strong></p>
+                            <p>{{ post.body | safe }}</p>
+                            <p>{{ post.formatted_timestamp }}</p>
+                            <div class="likes-comments">
+                                <p>Liked by: {{ post.liked_by.count }}</p>
+                                <p>Comments: {{ post.comments.count }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+    </section>
 
 
 

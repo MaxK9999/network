@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const postItem = document.createElement('div');
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
-                        <p class="post-author"><strong>${post.author}</strong></p>
+                        <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
                         <p>${post.text}</p>
                         <p>${post.timestamp}</p>
                         <div class="likes-comments">

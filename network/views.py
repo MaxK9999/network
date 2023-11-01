@@ -1,11 +1,10 @@
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -96,7 +95,6 @@ def new_post(request):
     })
     
     
-
 def get_posts(request):
     posts = Post.objects.all().order_by("-timestamp")
     paginator = Paginator(posts, 10)
@@ -122,7 +120,7 @@ def get_posts(request):
         post_data.append({
             'id': post.id,
             'text': post.body,
-            'timestamp': post.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
+            'timestamp': post.formatted_timestamp(),
             'author': post.user.username,
             'comments': comments,
             'liked_by': [user.username for user in post.liked_by.all()],
@@ -137,13 +135,48 @@ def get_posts(request):
     }, safe=True)
 
     
-
 @login_required
 def edit_post(request):
     pass
 
 
- 
 @login_required
 def create_comment(request):
     pass
+
+
+
+def profile_page(request, username):
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return render(request, "network/profile.html", {
+            'user': None,
+        })
+    
+    is_following = False;
+    if request.user.is_authenticated and request.user != user:
+        is_following = request.user in user.followers.all()
+        
+    if request.method == "POST":
+        if 'follow' in request.POST and not is_following:
+            user.followers.add(request.user)
+            is_following = True
+        elif 'unfollow' in request.POST and is_following:
+            user.followers.remove(request.user)
+            is_following = False
+    
+            
+    user_posts = Post.objects.filter(user=user).order_by('-timestamp')
+    return render(request, "network/profile.html", {
+        'user': user,
+        'followers': user.followers.all(),
+        'following': user.following.all(),
+        'bio': user.bio,
+        'website': user.website,
+        'profile_pic': user.profile_pic,
+        'user_posts': user_posts,
+        'comments': user.comments.all(),
+        'liked_posts': user.liked_posts.all(),
+        'is_following': is_following,
+    })

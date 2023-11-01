@@ -123,9 +123,64 @@ body #posts-container #post-list .post-author {
   font-family: Arial, Helvetica, sans-serif;
   margin-bottom: 10px;
 }
+body #posts-container #post-list .post-author a {
+  text-decoration: none;
+  color: white;
+}
+body #posts-container #post-list .post-author a:hover {
+  text-decoration: underline;
+}
 body #posts-container #post-list .likes-comments {
   margin-top: 15px;
   display: flex;
   justify-content: space-around;
   flex-direction: row;
+}
+body #profile {
+  margin-left: 5%;
+  margin-right: 5%;
+  border-radius: 10px;
+  background-color: rgba(44, 44, 44, 0.568);
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+body #profile h1 {
+  font-size: 40px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+body #profile .profile-details {
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+body #profile .profile-details p {
+  margin-left: 20px;
+}
+body #all-posts {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-left: 25%;
+}
+body #all-posts h2 {
+  font-size: 40px;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 40px;
 }/*# sourceMappingURL=styles.css.map */
