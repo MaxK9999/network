@@ -59,11 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    fetchAndDisplayPosts(currentPage);
+
 
     // Form submission
-    // Make sure that the form submits a new post to the top of the load_posts view
-    // when it is submitted by the user
     const postForm = document.getElementById('post-form');
+
+
     postForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(postForm);

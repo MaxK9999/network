@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block body %}
-
+    
     {% if user.is_authenticated %}
     <div id="container-post">
         <h5>Share your thoughts...</h5>
@@ -22,9 +22,8 @@
 
     <div id="loading-text"></div>
 
-    <script src="{% static 'network/script.js' %}">
-
-    </script>
+    <script src="{% static 'network/script.js' %}"></script>
+    
 {% endblock %}
 
 

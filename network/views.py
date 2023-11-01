@@ -13,7 +13,9 @@ from .models import User, Post, Comment
 
 
 def index(request):
-    return render(request, "network/index.html")
+    return render(request, "network/index.html", {
+        "posts": Post.objects.all().order_by("-timestamp")
+    })
 
 
 def login_view(request):
@@ -135,13 +137,13 @@ def get_posts(request):
     }, safe=True)
 
     
-@csrf_exempt
+
 @login_required
 def edit_post(request):
     pass
 
 
-@csrf_exempt 
+ 
 @login_required
 def create_comment(request):
     pass
