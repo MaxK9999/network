@@ -23,11 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const postItem = document.createElement('div');
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
-                        <p><strong>${post.author}</strong></p>
+                        <p class="post-author"><strong>${post.author}</strong></p>
                         <p>${post.text}</p>
                         <p>${post.timestamp}</p>
-                        <p>Liked by: ${post.liked_by.join(', ')}</p>
-                        <p>Comments: ${post.comments.length}</p>
+                        <div class="likes-comments">
+                            <p>Liked by: ${post.liked_by.join(', ')}</p>
+                            <p>Comments: ${post.comments.length}</p>
+                        </div>
+
                     `;
                     postList.appendChild(postItem);
                 });
@@ -69,6 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
     postForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(postForm);
+        const textarea = formData.get('body');
+        const formattedText = textarea.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+        formData.set('body', formattedText);
+
         fetch('/new_post', {
                 method: 'POST',
                 body: formData,
@@ -80,11 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const postItem = document.createElement('div');
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
-                        <p><strong>${data.post.user}</strong></p>
+                        <p class="post-author"><strong>${data.post.user}</strong></p>
                         <p>${data.post.body}</p>
                         <p>${data.post.timestamp}</p>
-                        <p>Liked by: ${data.post.liked_by.join(', ')}</p>
-                        <p>Comments: ${data.post.comments}</p>
+                        <div class="likes-comments">        
+                            <p>Liked by: ${data.post.liked_by.join(', ')}</p>
+                            <p>Comments: ${data.post.comments}</p>
+                        </div>
                     `;
                     postList.insertBefore(postItem, postList.firstChild);
                 }

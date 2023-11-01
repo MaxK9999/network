@@ -1,6 +1,11 @@
 nav {
-    background-color: rgba(255, 255, 255, 0.658);
+    // make sure the navbar stays visible when scrolling
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(197, 197, 197, 0.918);
     border-bottom: 1px solid rgba(170, 170, 170, 0.589);
+    
     .navbar-brand {
         font-size: 28px;
         font-weight: 600;
@@ -13,94 +18,129 @@ nav {
 }
 
 body {
+    background-image: url("/static/network/images/background1.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
     background-color: rgba(243, 239, 239, 0.904);
 
-    #container-post {
-        background-color: rgb(216, 215, 215);
-        padding: 20px;
-        max-width: fit-content;
-        flex-wrap: wrap;
+
+    #posts-container {
         display: flex;
-        flex-direction: column;
-        border-radius: 0 0 18px;
-        border-bottom: 1px solid rgba(170, 170, 170, 0.589);
-        border-right: 1px solid rgba(170, 170, 170, 0.589);
+        justify-content: space-between;
+        align-items: flex-start;        
 
-        h5 {
-            margin-left: 20px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+        #container-post {
+            background-color: rgb(216, 215, 215);
+            padding: 20px;
+            max-width: fit-content;
+            flex-wrap: wrap;
+            flex: 1;
+            border-radius: 0 0 18px;
+            border-bottom: 1px solid rgba(170, 170, 170, 0.589);
+            border-right: 1px solid rgba(170, 170, 170, 0.589);
 
-        #post-content{
-            border-radius: 40px;
-            padding: 10px;
-            height: 45px;
-            width: 250px;
-            resize: none;
-            background-color: rgba(255, 255, 255, 0.74);
-            overflow-y: hidden;
-            transition: all 0.4s ease;
-            outline: none;
-            box-shadow: none;
-
-            &:hover {
-                background-color: rgba(231, 231, 231, 0.74);
+            h5 {
+                margin-left: 20px;
+                font-family: Arial, Helvetica, sans-serif;
             }
 
-            &:focus {
+            #post-content{
+                border-radius: 40px;
+                padding: 10px;
+                height: 45px;
+                width: 250px;
+                resize: none;
+                background-color: rgba(255, 255, 255, 0.74);
+                overflow-y: hidden;
                 transition: all 0.4s ease;
-                height: 250px;
-                padding: 20px;
+                outline: none;
+                box-shadow: none;
+
+                &:hover {
+                    background-color: rgba(231, 231, 231, 0.74);
+                }
+
+                &:focus {
+                    transition: all 0.4s ease;
+                    height: 250px;
+                    padding: 20px;
+                }
+            }
+
+            label {
+                background-color: rgba(243, 243, 243, 0.796);
+                border: 1px solid rgba(151, 151, 151, 0.867);
+                border-radius: 16px;
+                transition: all 0.4s ease;
+                
+                &:hover {
+                    background-color: aquamarine;
+                    transform: scale(1.1);
+                }
+
+                input[type="file"] {
+                    display: none;
+                }
+
+                i {
+                    padding: 20px;
+                }
+            }
+
+            #post-button {
+                border-radius: 16px;
+                border: 1px solid rgba(151, 151, 151, 0.867);
+                padding: 9px;
+                width: 60px;
+                margin-top: 8px;
+                margin-left: 10px;
+                transition: all 0.4s ease;
+                outline: none;
+                box-shadow: none;
+
+                &:hover {
+                    background-color: rgba(59, 235, 255, 0.827);
+                    transform: scale(1.1);
+                }
             }
         }
 
-        label {
-            background-color: rgba(243, 243, 243, 0.796);
-            border: 1px solid rgba(151, 151, 151, 0.867);
-            border-radius: 16px;
-            transition: all 0.4s ease;
-            
-            &:hover {
-                background-color: aquamarine;
-                transform: scale(1.1);
+        #post-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-left: 5%;
+            margin-right: 5%;
+            border: 1px solid rgba(0, 0, 0, 0.589);
+            background-color: rgba(44, 44, 44, 0.568);
+            padding: 10px;
+
+            .post-item {
+                padding: 28px;
+                color: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 300px;
+                max-height: fit-content;
+                margin-bottom: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.589);
             }
-
-            input[type="file"] {
-                display: none;
+            .post-author {
+                font-size: 30px;
+                font-family: Arial, Helvetica, sans-serif;
+                margin-bottom: 10px;
             }
-
-            i {
-                padding: 20px;
+            .likes-comments {
+                margin-top: 15px;
+                display: flex;
+                justify-content: space-around;
+                flex-direction: row;
             }
-        }
-
-        #post-button {
-            border-radius: 16px;
-            border: 1px solid rgba(151, 151, 151, 0.867);
-            padding: 9px;
-            width: 60px;
-            margin-top: 8px;
-            margin-left: 10px;
-            transition: all 0.4s ease;
-            outline: none;
-            box-shadow: none;
-
-            &:hover {
-                background-color: rgba(59, 235, 255, 0.827);
-                transform: scale(1.1);
-            }
-        }
-    }
-
-    #post-list {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid rgba(170, 170, 170, 0.589);
-        background-color: rgb(185, 130, 130);
-        padding: 10px;
-
-        .post-item {
-            margin-bottom: 10px;
         }
     }
 }

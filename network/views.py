@@ -8,14 +8,13 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import User, Post, Comment
 
 
 def index(request):
-    return render(request, "network/index.html", {
-        "posts": Post.objects.all().order_by("-timestamp")
-    })
+    return render(request, "network/index.html")
 
 
 def login_view(request):
@@ -83,13 +82,14 @@ def new_post(request):
     
     post = Post(user=user, body=body)
     post.save()
-        
+    
+    formatted_timestamp = post.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S")
     return JsonResponse({
         "message": "Post created successfully!",
         "post": {
             "user": user.username,
             "body": body,
-            "timestamp": post.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": formatted_timestamp,
             "liked_by": [],
             "comments": []
         }
@@ -116,18 +116,18 @@ def get_posts(request):
             comments.append({
                 'id': comment.id,
                 'text': comment.body,
-                'timestamp': str(comment.timestamp),
+                'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
                 'author': comment.user.username,
             })
         post_data.append({
             'id': post.id,
             'text': post.body,
-            'timestamp': str(post.timestamp),
+            'timestamp': post.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
             'author': post.user.username,
             'comments': comments,
             'liked_by': [user.username for user in post.liked_by.all()],
         })
-        
+    
     return JsonResponse({
         'posts': post_data,
         'num_pages': paginator.num_pages,

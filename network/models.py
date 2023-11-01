@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 from django.db import models
 
 
@@ -28,12 +29,13 @@ class Post(models.Model):
     comments = models.ManyToManyField(Comment, related_name="post_comments", blank=True)
     
     def serialize(self):
+        
         return {
             "id": self.id,
             "user": self.user,
             "body": self.body,
             "image": self.image,
-            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "timestamp": self.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
             "liked_by": [user.username for user in self.liked_by.all()],
             "comments": [comment.serialize() for comment in self.comments.all()],
         }
