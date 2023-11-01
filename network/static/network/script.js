@@ -67,8 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form submission
     const postForm = document.getElementById('post-form');
-
-
     postForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(postForm);
