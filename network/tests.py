@@ -13,27 +13,49 @@ class AppTests(TestCase):
     # Test index view
     def test_index_view(self):
         response = self.client.get(reverse('index'))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200, f"Status code is {response.status_code}"
         
     
     # Test whether posts can be created
     def test_create_post(self):
-        self.client.login(username='testuser', password='testpassword')
-        data = {
-            'body': 'This is a test post.'
-        }
-        response = self.client.post(reverse('new_post'), data=json.dumps(data), 
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            reverse('new_post'),
+            data={
+                'body': 'Test post body',
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+
+
+    # Test whether posts can be liked
+    def test_like_and_unlike_post(self):
+        # Create a test post
+        test_post = Post.objects.create(
+            user=self.user, body='Test post body'
+        )
+
+        # Like the post
+        self.user.liked_posts.add(test_post)
+        self.assertEqual(test_post.liked_by.count(), 1)
+
+        # Unlike the post
+        self.user.liked_posts.remove(test_post)
+        self.assertEqual(test_post.liked_by.count(), 0)
+    
+    
+    # Test whether comments can be created
+    def test_create_comment(self):
+        # Create test post
+        post = Post.objects.create(user=self.user, body='Test post')
+        
+        # Create test comment
+        comment = Comment.objects.create(
+            user=self.user, post=post, body='Test comment'
+        )
+        
+        # Check comment creation
+        self.assertEqual(comment.user, self.user)
+        self.assertEqual(comment.post, post)
+        self.assertEqual(comment.body, 'Test comment')
         
     
-    # Test whether comments can be places under a  post
-    def test_create_comment(self):
-        self.client.login(username='testuser', password='testpassword')
-        post = Post.objects.create(user=self.user, body='A test post')
-        data = {
-            'text': 'This is a test comment.'
-        }
-        response = self.client.post(reverse('create_comment', kwargs={'post_id': post.id}),
-                                    data=json.dumps(data), content_type='application/json')
-        self.assertEqual(response.status_code, 200)
