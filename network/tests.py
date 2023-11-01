@@ -59,3 +59,15 @@ class AppTests(TestCase):
         self.assertEqual(comment.body, 'Test comment')
         
     
+    # Test follow and unfollow
+    def test_follow_and_unfollow(self):
+        # Create test user
+        test_user = User.objects.create_user(username='testuser2', password='testpassword')
+        
+        # Follow the user
+        self.user.followers.add(test_user)
+        self.assertEqual(self.user.followers.count(), 1)
+        
+        # Unfollow the user
+        self.user.followers.remove(test_user)
+        self.assertEqual(self.user.followers.count(), 0)
