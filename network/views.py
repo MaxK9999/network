@@ -147,33 +147,14 @@ def create_comment(request):
 
 
 def profile_page(request, username):
-    if not request.user.is_authenticated:
-        user = User.objects.get(username=username)
-    else:
-        user = request.user
+    current_user = request.user
+    user = User.objects.get(username=username)
         
-    posts = Post.objects.filter(user=user).order_by('-timestamp')
-    paginator = Paginator(posts, 10) 
-    page_number = request.GET.get('page')
-    try:
-        posts = paginator.page(page_number)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)  
-        
-    serialized_user = {
+    return JsonResponse({
+        'current_user': current_user.username,
         'username': user.username,
         'bio': user.bio,
         'website': user.website,
-    }
-        
-        
-    return JsonResponse({
-        'username': serialized_user['username'],
-        'bio': serialized_user['bio'],
-        'website': serialized_user['website'],
-        'posts': [post.serialize() for post in posts],
         'followers': user.followers.count(),
         'following': user.following.count(),        
     }, safe=True)
