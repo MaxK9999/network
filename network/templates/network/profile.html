@@ -6,7 +6,7 @@
     <section id="profile-page">
 
         <div id="profile">
-            <h1>{{ user.username }}</h1>
+            <!--Need to implement a displayable username-->
             {% if user != request.user %}
                 <form action="{% url 'profile_page' user.username %}" method="post">
                     {% csrf_token %}
@@ -45,7 +45,5 @@
         </div>
         
     </section>
-
-
 
 {% endblock  %}

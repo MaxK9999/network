@@ -169,7 +169,7 @@ def profile_page(request, username):
             
     user_posts = Post.objects.filter(user=user).order_by('-timestamp')
     return render(request, "network/profile.html", {
-        'user': user,
+
         'followers': user.followers.all(),
         'following': user.following.all(),
         'bio': user.bio,
