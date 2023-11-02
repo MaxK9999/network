@@ -38,7 +38,7 @@ class Post(models.Model):
         return self.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S")
     def serialize(self):
         
-        return {
+        return { 
             "id": self.id,
             "user": self.user,
             "body": self.body,

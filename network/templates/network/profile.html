@@ -7,16 +7,6 @@
 
         <div id="profile">
             <h1>{{ user.username }}</h1>
-            {% if user != request.user %}
-                <form action="{% url 'profile_page' user.username %}" method="post">
-                    {% csrf_token %}
-                    {% if is_following %}
-                        <button type="submit" name="unfollow">Unfollow</button>
-                    {% else %}
-                        <button type="submit" name="follow">Follow</button>
-                    {% endif %}
-                </form>
-            {% endif %}
             <p>{{ user.bio }}</p>
             <div class="profile-details">
                 <p><a href="{{ user.website }}">{{ user.website }}</a></p>
@@ -46,6 +36,5 @@
         
     </section>
 
-
-
+    <script src="{% static 'network/script.js' %}"></script>
 {% endblock  %}

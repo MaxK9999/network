@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
+from yaml import serialize
 
 from .models import User, Post, Comment
 
@@ -145,38 +146,54 @@ def create_comment(request):
     pass
 
 
-
 def profile_page(request, username):
-    try:
+    if not request.user.is_authenticated:
         user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return render(request, "network/profile.html", {
-            'user': None,
-        })
-    
-    is_following = False;
-    if request.user.is_authenticated and request.user != user:
-        is_following = request.user in user.followers.all()
+    else:
+        user = request.user
         
-    if request.method == "POST":
-        if 'follow' in request.POST and not is_following:
-            user.followers.add(request.user)
-            is_following = True
-        elif 'unfollow' in request.POST and is_following:
-            user.followers.remove(request.user)
-            is_following = False
-    
-            
-    user_posts = Post.objects.filter(user=user).order_by('-timestamp')
-    return render(request, "network/profile.html", {
-        'user': user,
-        'followers': user.followers.all(),
-        'following': user.following.all(),
+    posts = Post.objects.filter(user=user).order_by('-timestamp')
+    paginator = Paginator(posts, 10) 
+    page_number = request.GET.get('page')
+    try:
+        posts = paginator.page(page_number)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)  
+        
+    serialized_user = {
+        'username': user.username,
         'bio': user.bio,
         'website': user.website,
-        'profile_pic': user.profile_pic,
-        'user_posts': user_posts,
-        'comments': user.comments.all(),
-        'liked_posts': user.liked_posts.all(),
-        'is_following': is_following,
-    })
+    }
+        
+        
+    return JsonResponse({
+        'username': serialized_user['username'],
+        'bio': serialized_user['bio'],
+        'website': serialized_user['website'],
+        'posts': [post.serialize() for post in posts],
+        'followers': user.followers.count(),
+        'following': user.following.count(),        
+    }, safe=True)
+    
+
+@login_required
+def follow(request, username):
+    if request.method != "POST":
+        return JsonResponse({
+            "message": "Request method must be POST!"
+        }, status=405)
+    
+    user = request.user
+    follow_user = User.objects.get(username=username)
+    
+    if follow_user in user.following.all():
+        user.following.remove(follow_user)
+    else:
+        user.following.add(follow_user)
+    
+    return JsonResponse({
+        "message": "Followed successfully!",
+    }, safe=True)
