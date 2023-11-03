@@ -8,7 +8,6 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
-from yaml import serialize
 
 from .models import User, Post, Comment
 
@@ -150,13 +149,41 @@ def profile_page(request, username):
     current_user = request.user
     user = User.objects.get(username=username)
         
-    return JsonResponse({
+    return render(request, "network/profile.html", {
         'current_user': current_user.username,
         'username': user.username,
         'bio': user.bio,
         'website': user.website,
         'followers': user.followers.count(),
-        'following': user.following.count(),        
+        'following': user.following.count(),
+    })
+    
+
+def get_user_posts(request, username):
+    user = User.objects.get(username=username)
+    posts = Post.objects.filter(user=user).order_by("-timestamp")
+    
+    post_data = []
+    post_data = []
+    for post in posts:
+        comments = []
+        for comment in post.comments.all():
+            comments.append({
+                'id': comment.id,
+                'text': comment.body,
+                'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
+                'author': comment.user.username,
+            })
+        post_data.append({
+            'id': post.id,
+            'text': post.body,
+            'timestamp': post.formatted_timestamp(),
+            'author': post.user.username,
+            'comments': comments,
+            'liked_by': [user.username for user in post.liked_by.all()],
+        })
+    return JsonResponse({
+        'posts': post_data
     }, safe=True)
     
 
@@ -175,6 +202,4 @@ def follow(request, username):
     else:
         user.following.add(follow_user)
     
-    return JsonResponse({
-        "message": "Followed successfully!",
-    }, safe=True)
+    return redirect('profile_page', username)

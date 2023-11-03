@@ -51,22 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingText.textContent = '';
             });
     }   
-
-    // Function to fetch and display profile data from server
-    function fetchAndDisplayProfileData(username) {
-        fetch(`/profile_page/?username=${username}`)
-            .then(response => response.json())
-            .then(data => {
-                const usernameElement = document.getElementById('username');
-                const bioElement = document.getElementById('bio');
-                const websiteElement = document.getElementById('website');
-                const followersCountElement = document.getElementById('followers-count');
-                const followingCountElement = document.getElementById('following-count');
-            })
-            .catch(error => {
-                console.error('Error fetching and displaying profile data:', error);
-            });
-    }
    
     let timeout;
     window.addEventListener('scroll', function() {
@@ -77,10 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     });
-    fetchAndDisplayProfileData('currentUsername');
-
+     
     fetchAndDisplayPosts(currentPage);
-
 
     // Form submission
     const postForm = document.getElementById('post-form');
@@ -119,4 +101,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }); 
 
     fetchAndDisplayPosts(currentPage);
+
 });

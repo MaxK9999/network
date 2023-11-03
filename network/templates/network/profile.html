@@ -6,7 +6,23 @@
     <section id="profile-page">
 
         <div id="profile">
-            <div class="profile-details">
+            <h2>{{ username }}</h2>
+            {% if user.is_authenticated and user.username != username %}
+                <form id="follow-form" method="post" action="{% url 'follow' username %}">
+                    {% csrf_token %}
+                    <button type="submit" id="follow-button">
+                        {% if user in user.following.all %}
+                            Unfollow
+                        {% else %}
+                            Follow
+                        {% endif %}
+                    </button>
+                </form>
+            {% endif %}
+            <p>{{ bio }}</p>
+            <div id="profile-details">
+                <p>Followers: {{ followers }}</p>
+                <p>Following: {{ following }}</p>
             </div>
         </div>
 
@@ -14,17 +30,6 @@
             <h2>All Posts</h2>
             <div id="posts-container">
                 <div id="post-list">
-                    {% for post in user_posts %}
-                        <div class="post-item">
-                            <p class="post-author"><strong>{{ post.user }}</strong></p>
-                            <p>{{ post.body | safe }}</p>
-                            <p>{{ post.formatted_timestamp }}</p>
-                            <div class="likes-comments">
-                                <p>Liked by: {{ post.liked_by.count }}</p>
-                                <p>Comments: {{ post.comments.count }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -32,4 +37,35 @@
     </section>
 
     <script src="{% static 'network/script.js' %}"></script>
+    <script>
+        function fetchUserPosts() {
+            fetch(`/get_user_posts/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    const postList = document.getElementById('post-list')
+                    data.posts.forEach(post => {
+                        const postItem = document.createElement('div')
+                        postItem.className = 'post-item'
+                        postItem.innerHTML = `
+                            <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
+                            <p>${post.text}</p>
+                            <p>${post.timestamp}</p>
+                            <div class="likes-comments">
+                                <p>Liked by: ${post.liked_by.join(', ')}</p>
+                                <p>Comments: ${post.comments.length}</p>
+                            </div>
+                        `
+                        postList.appendChild(postItem)
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching posts:', error)
+                });
+        }
+
+        const username = "{{ username }}"
+        fetchUserPosts()
+
+    </script>
 {% endblock  %}
