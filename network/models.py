@@ -5,14 +5,24 @@ from django.db import models
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
-    followers = models.ManyToManyField('self', related_name="following_users", blank=True)
-    following = models.ManyToManyField('self', related_name="followers_users", blank=True)
     bio = models.TextField(max_length=500, blank=True)
     website = models.URLField(max_length=200, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     likes = models.ManyToManyField('Post', related_name="liking_users", blank=True)
     comments = models.ManyToManyField('Comment', related_name="commented_by", blank=True)
     posts = models.ManyToManyField('Post', related_name="posted_by", blank=True)	
+    
+    def is_followed_by(self, user):
+        return Follower.objects.filter(user_to=self, user_from=user).exists()
+    
+
+class Follower(models.Model):
+    user_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name="relation_from")
+    user_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="relation_to")
+    created = models.DateTimeField(default=timezone.now, db_index=True)
+    
+    def __str__(self):
+        return f'{self.user_from.username} follows {self.user_to.username}'
 
 
 class Comment(models.Model):

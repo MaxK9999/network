@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import User, Post, Comment
+from .models import User, Post, Comment, Follower
 
 
 def index(request):
@@ -148,17 +148,38 @@ def create_comment(request):
 def profile_page(request, username):
     current_user = request.user
     user = User.objects.get(username=username)
+    is_followed = False
+    if current_user.is_authenticated:
+        is_followed = user.is_followed_by(current_user)
         
+    follower_count = Follower.objects.filter(user_to=user).count()
+    following_count = Follower.objects.filter(user_from=user).count()
+   
     return render(request, "network/profile.html", {
         'current_user': current_user.username,
         'username': user.username,
         'bio': user.bio,
         'website': user.website,
-        'followers': user.followers.count(),
-        'following': user.following.count(),
+        'is_followed': is_followed,
+        'follower_count': follower_count,
+        'following_count': following_count,
     })
     
 
+@login_required
+def follow(request, username):
+    if request.user.is_authenticated:
+        current_user = request.user
+        target_user = User.objects.get(username=username)
+
+        if target_user.is_followed_by(current_user):
+            Follower.objects.filter(user_from=current_user, user_to=target_user).delete()
+        else:
+            Follower(user_from=current_user, user_to=target_user).save()
+            
+    return redirect('profile_page', username)
+
+    
 def get_user_posts(request, username):
     user = User.objects.get(username=username)
     posts = Post.objects.filter(user=user).order_by("-timestamp")
@@ -187,19 +208,3 @@ def get_user_posts(request, username):
     }, safe=True)
     
 
-@login_required
-def follow(request, username):
-    if request.method != "POST":
-        return JsonResponse({
-            "message": "Request method must be POST!"
-        }, status=405)
-    
-    user = request.user
-    follow_user = User.objects.get(username=username)
-    
-    if follow_user in user.following.all():
-        user.following.remove(follow_user)
-    else:
-        user.following.add(follow_user)
-    
-    return redirect('profile_page', username)

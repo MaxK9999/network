@@ -147,7 +147,7 @@ body #profile {
   align-items: center;
   flex-direction: column;
 }
-body #profile h1 {
+body #profile h2 {
   font-size: 40px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 600;
@@ -167,20 +167,12 @@ body #profile .profile-details {
 body #profile .profile-details p {
   margin-left: 20px;
 }
-body #all-posts {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin-left: 25%;
+body #profile-content {
+  margin-top: 70px;
 }
-body #all-posts h2 {
-  font-size: 40px;
-  font-family: Arial, Helvetica, sans-serif;
+body #profile-content #posts-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  margin-top: 40px;
+}
+body #profile-content #posts-container #post-list {
+  flex: 2;
 }/*# sourceMappingURL=styles.css.map */
