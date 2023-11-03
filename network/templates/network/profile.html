@@ -37,36 +37,73 @@
         
     </section>
 
-    <script src="{% static 'network/script.js' %}"></script>
+    <div id="loading-text"></div>
+    
+
     <script>
 
-        function fetchUserPosts() {
-            fetch(`/get_user_posts/${username}`)
+        let currentPage = 1;
+        const postsPerPage = 10;
+        let loadMorePosts = false;
+        let allPostsLoaded = false;
+    
+        function fetchUserPosts(username, page) {
+            if (loadMorePosts || allPostsLoaded) {
+                return;
+            }
+            loadMorePosts = true;
+            const loadingText = document.getElementById('loading-text');
+            loadingText.textContent = 'Loading...';
+    
+            fetch(`/get_user_posts/${username}?page=${page}`)
                 .then(response => response.json())
                 .then(data => {
-                    const postList = document.getElementById('post-list')
+                    const postList = document.getElementById('post-list');
+    
                     data.posts.forEach(post => {
-                        const postItem = document.createElement('div')
-                        postItem.className = 'post-item'
+                        const postItem = document.createElement('div');
+                        postItem.className = 'post-item';
                         postItem.innerHTML = `
-                            <p class="post-author"><strong>${post.author}</a></strong></p>
+                            <p class="post-author"><strong>${post.author}</strong></p>
                             <p>${post.text}</p>
                             <p>${post.timestamp}</p>
                             <div class="likes-comments">
                                 <p>Liked by: ${post.liked_by.join(', ')}</p>
                                 <p>Comments: ${post.comments.length}</p>
                             </div>
-                        `
-                        postList.appendChild(postItem)
+                        `;
+                        postList.appendChild(postItem);
                     });
+    
+                    currentPage++;
+                    loadMorePosts = false;
+    
+                    if (data.posts.length < postsPerPage) {
+                        allPostsLoaded = true;
+                        loadingText.textContent = 'No more posts to load';
+                    } else {
+                        loadingText.textContent = '';
+                    }
                 })
                 .catch(error => {
-                    console.error('Error fetching posts:', error)
+                    console.error('Error fetching posts:', error);
+                    loadMorePosts = false;
+                    loadingText.textContent = '';
                 });
         }
-
-        const username = "{{ username }}"
-        fetchUserPosts()
+    
+        let timeout;
+        window.addEventListener('scroll', function () {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    fetchUserPosts(username, currentPage);
+                }, 1000);
+            }
+        });
+    
+        const username = "{{ username }}";
+        fetchUserPosts(username, currentPage);
     </script>
 
 {% endblock  %}

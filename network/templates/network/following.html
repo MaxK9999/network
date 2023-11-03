@@ -15,18 +15,36 @@
             </div>
         </div>
 
+        
+
 
     </section>
 
+    <div id="loading-text"></div>
 
-    <script src="{% static 'network/script.js' %}"></script>
+
+
+    
     <script>
 
-        function fetchFollowingPosts() {
-            fetch(`/following_posts`)
+        let currentPage = 1;
+        const postsPerPage = 10;
+        let loadMorePosts = false;
+        let allPostsLoaded = false;
+
+        function fetchFollowingPosts(page) {
+            if (loadMorePosts || allPostsLoaded) {
+                return;
+            }
+            loadMorePosts = true;
+            const loadingText = document.getElementById('loading-text');
+            loadingText.textContent = 'Loading...';
+
+            fetch(`/following_posts?page=${page}`)
                 .then(response => response.json())
                 .then(data => {
                     const postList = document.getElementById('post-list');
+
                     data.posts.forEach(post => {
                         const postItem = document.createElement('div');
                         postItem.className = 'post-item';
@@ -41,13 +59,35 @@
                         `;
                         postList.appendChild(postItem);
                     });
+
+                    currentPage++;
+                    loadMorePosts = false;
+
+                    if (data.posts.length < postsPerPage) {
+                        allPostsLoaded = true;
+                        loadingText.textContent = 'No more posts to load';
+                    } else {
+                        loadingText.textContent = '';
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching follower posts:', error);
+                    loadMorePosts = false;
+                    loadingText.textContent = '';
                 });
         }
 
-        fetchFollowingPosts();
+        let timeout;
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                this.clearTimeout(timeout);
+                timeout = this.setTimeout(function() {
+                    fetchFollowingPosts(currentPage);
+                }, 1000);
+            }
+        });
+        fetchFollowingPosts(currentPage);
+
         
     </script>
 
