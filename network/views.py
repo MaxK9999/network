@@ -179,12 +179,55 @@ def follow(request, username):
             
     return redirect('profile_page', username)
 
+
+@login_required
+def following_page(request):
+    current_user = request.user
+    
+    return render(request, "network/following.html", {
+        'current_user': current_user.username,
+    })
+
+
+@login_required
+def following_posts(request):
+    current_user = request.user
+    following = Follower.objects.filter(user_from=current_user).values_list('user_to', flat=True)
+    
+    if not following:
+        return JsonResponse({
+            'message': 'You are not following anyone!',
+        }, safe=True)
+    
+    posts = Post.objects.filter(user__in=following).order_by("-timestamp")
+    post_data = []    
+    for post in posts:
+        comments = []
+        for comment in post.comments.all():
+            comments.append({
+                'id': comment.id,
+                'text': comment.body,
+                'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
+                'author': comment.user.username,
+            })
+        post_data.append({
+            'id': post.id,
+            'text': post.body,
+            'timestamp': post.formatted_timestamp(),
+            'author': post.user.username,
+            'comments': comments,
+            'liked_by': [user.username for user in post.liked_by.all()],
+        })
+    
+    return JsonResponse({
+        'posts': post_data
+    }, safe=True)
+    
     
 def get_user_posts(request, username):
     user = User.objects.get(username=username)
     posts = Post.objects.filter(user=user).order_by("-timestamp")
     
-    post_data = []
     post_data = []
     for post in posts:
         comments = []

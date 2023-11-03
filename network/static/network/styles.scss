@@ -171,6 +171,28 @@ body {
             margin-bottom: 20px;
         }
 
+        #follow-button {
+            border-radius: 16px;
+            border: 1px solid rgba(139, 139, 139, 0.867);
+            padding: 9px;
+            width: fit-content;
+            margin-top: 8px;
+            transition: all 0.4s ease;
+            outline: none;
+            box-shadow: none;
+
+            &.unfollow:hover {
+                background-color: rgb(223, 153, 153);
+            }
+            &.follow:hover {
+                background-color: rgb(111, 169, 245)
+            }
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+
         .profile-details {
             font-size: 20px;
             font-family: Arial, Helvetica, sans-serif;

@@ -6,21 +6,15 @@
     <section id="profile-page">
 
         <div id="profile">
-<<<<<<< HEAD
-            <!--Need to implement a displayable username-->
-            {% if user != request.user %}
-                <form action="{% url 'profile_page' user.username %}" method="post">
-=======
             <h2>{{ username }}</h2>
             {% if user.is_authenticated %}
                 {% if username != current_user %}
                 <form action="{% url 'follow' username %}" id="follow-form" method="POST">
->>>>>>> profile_page
                     {% csrf_token %}
                     {% if is_followed %}
-                        <button id="follow-button">Unfollow</button>
+                        <button id="follow-button" class="unfollow">Unfollow</button>
                     {% else %}
-                        <button id="follow-button">Follow</button>
+                        <button id="follow-button" class="follow">Follow</button>
                     {% endif %}
                 </form>
                 {% endif %}
@@ -43,8 +37,6 @@
         
     </section>
 
-<<<<<<< HEAD
-=======
     <script src="{% static 'network/script.js' %}"></script>
     <script>
 
@@ -75,9 +67,6 @@
 
         const username = "{{ username }}"
         fetchUserPosts()
-        
-
     </script>
 
->>>>>>> profile_page
 {% endblock  %}

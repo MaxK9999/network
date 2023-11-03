@@ -1,0 +1,55 @@
+{% extends 'network/layout.html' %}
+{% load static %}
+
+{% block body %}
+    
+    <section id="following-page">
+        
+        <div id="following-page-header">
+            <h2>Following</h2>
+
+        </div>
+
+        <div id="posts-container">
+            <div id="post-list">
+            </div>
+        </div>
+
+
+    </section>
+
+
+    <script src="{% static 'network/script.js' %}"></script>
+    <script>
+
+        function fetchFollowingPosts() {
+            fetch(`/following_posts`)
+                .then(response => response.json())
+                .then(data => {
+                    const postList = document.getElementById('post-list');
+                    data.posts.forEach(post => {
+                        const postItem = document.createElement('div');
+                        postItem.className = 'post-item';
+                        postItem.innerHTML = `
+                            <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
+                            <p>${post.text}</p>
+                            <p>${post.timestamp}</p>
+                            <div class="likes-comments">
+                                <p>Liked by: ${post.liked_by.join(', ')}</p>
+                                <p>Comments: ${post.comments.length}</p>
+                            </div>
+                        `;
+                        postList.appendChild(postItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching follower posts:', error);
+                });
+        }
+
+        fetchFollowingPosts();
+        
+    </script>
+
+{% endblock  %}
+
