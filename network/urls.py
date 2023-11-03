@@ -13,4 +13,6 @@ urlpatterns = [
     path("create_comment/<int:post_id>", views.create_comment, name="create_comment"),
     path("get_posts", views.get_posts, name="get_posts"),
     path("profile_page/<str:username>", views.profile_page, name="profile_page"),
+    path("follow/<str:username>", views.follow, name="follow"),
+    path("get_user_posts/<str:username>", views.get_user_posts, name="get_user_posts"),
 ]

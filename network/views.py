@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import User, Post, Comment
+from .models import User, Post, Comment, Follower
 
 
 def index(request):
@@ -145,38 +145,66 @@ def create_comment(request):
     pass
 
 
-
 def profile_page(request, username):
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return render(request, "network/profile.html", {
-            'user': None,
-        })
-    
-    is_following = False;
-    if request.user.is_authenticated and request.user != user:
-        is_following = request.user in user.followers.all()
+    current_user = request.user
+    user = User.objects.get(username=username)
+    is_followed = False
+    if current_user.is_authenticated:
+        is_followed = user.is_followed_by(current_user)
         
-    if request.method == "POST":
-        if 'follow' in request.POST and not is_following:
-            user.followers.add(request.user)
-            is_following = True
-        elif 'unfollow' in request.POST and is_following:
-            user.followers.remove(request.user)
-            is_following = False
-    
-            
-    user_posts = Post.objects.filter(user=user).order_by('-timestamp')
+    follower_count = Follower.objects.filter(user_to=user).count()
+    following_count = Follower.objects.filter(user_from=user).count()
+   
     return render(request, "network/profile.html", {
-
-        'followers': user.followers.all(),
-        'following': user.following.all(),
+        'current_user': current_user.username,
+        'username': user.username,
         'bio': user.bio,
         'website': user.website,
-        'profile_pic': user.profile_pic,
-        'user_posts': user_posts,
-        'comments': user.comments.all(),
-        'liked_posts': user.liked_posts.all(),
-        'is_following': is_following,
+        'is_followed': is_followed,
+        'follower_count': follower_count,
+        'following_count': following_count,
     })
+    
+
+@login_required
+def follow(request, username):
+    if request.user.is_authenticated:
+        current_user = request.user
+        target_user = User.objects.get(username=username)
+
+        if target_user.is_followed_by(current_user):
+            Follower.objects.filter(user_from=current_user, user_to=target_user).delete()
+        else:
+            Follower(user_from=current_user, user_to=target_user).save()
+            
+    return redirect('profile_page', username)
+
+    
+def get_user_posts(request, username):
+    user = User.objects.get(username=username)
+    posts = Post.objects.filter(user=user).order_by("-timestamp")
+    
+    post_data = []
+    post_data = []
+    for post in posts:
+        comments = []
+        for comment in post.comments.all():
+            comments.append({
+                'id': comment.id,
+                'text': comment.body,
+                'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
+                'author': comment.user.username,
+            })
+        post_data.append({
+            'id': post.id,
+            'text': post.body,
+            'timestamp': post.formatted_timestamp(),
+            'author': post.user.username,
+            'comments': comments,
+            'liked_by': [user.username for user in post.liked_by.all()],
+        })
+    return JsonResponse({
+        'posts': post_data
+    }, safe=True)
+    
+

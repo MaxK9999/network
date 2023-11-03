@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingText.textContent = '';
             });
     }   
-    
+   
     let timeout;
     window.addEventListener('scroll', function() {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
@@ -61,9 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     });
-
+     
     fetchAndDisplayPosts(currentPage);
-
 
     // Form submission
     const postForm = document.getElementById('post-form');
@@ -102,4 +101,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }); 
 
     fetchAndDisplayPosts(currentPage);
+    
 });
