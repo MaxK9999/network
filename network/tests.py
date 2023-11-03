@@ -1,5 +1,6 @@
+from urllib import response
 from django.test import TestCase
-from network.models import User, Post, Comment
+from network.models import Follower, User, Post, Comment
 from django.urls import reverse
 import json
 
@@ -8,6 +9,7 @@ class AppTests(TestCase):
     
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.target_user = User.objects.create_user(username='targetuser', password='testpassword')
         
     
     # Test index view
@@ -58,16 +60,15 @@ class AppTests(TestCase):
         self.assertEqual(comment.post, post)
         self.assertEqual(comment.body, 'Test comment')
         
+        
+    # Test whether user can follow others
+    def test_follow_user(self):
+        self.client.login(username='testuser', password='testpassword')
+        # Follow user
+        response = self.client.get(reverse('follow', args=['targetuser']))
+        self.assertTrue(Follower.objects.filter(user_from=self.user, user_to=self.target_user).exists())
+        # Unfollow user
+        response = self.client.get(reverse('follow', args=['targetuser']))
+        self.assertFalse(Follower.objects.filter(user_from=self.user, user_to=self.target_user).exists())
     
-    # Test follow and unfollow
-    def test_follow_and_unfollow(self):
-        # Create test user
-        test_user = User.objects.create_user(username='testuser2', password='testpassword')
-        
-        # Follow the user
-        self.user.followers.add(test_user)
-        self.assertEqual(self.user.followers.count(), 1)
-        
-        # Unfollow the user
-        self.user.followers.remove(test_user)
-        self.assertEqual(self.user.followers.count(), 0)
+    
