@@ -137,9 +137,39 @@ def get_posts(request):
     
 @login_required
 def edit_post(request):
-    pass
-
-
+    if request.method != "POST":
+        return JsonResponse({
+            "message": "Request method must be POST!"
+        }, status=405)
+    
+    post_id = request.POST.get("post_id")
+    edited_text = request.POST.get("edited_text")
+    
+    try:
+        post = Post.objects.get(id=post_id)
+        if post.user != request.user:
+            return JsonResponse({
+                "message": "You can only edit your own posts!",
+            }, status=403)
+        post.body = edited_text
+        post.save()
+        return JsonResponse({
+            "message": "Post edited successfully!",
+            "post": {
+                "id": post.id,
+                "text": post.body,
+                "timestamp": post.formatted_timestamp(),
+                "liked_by": [user.username for user in post.liked_by.all()],
+                "comments": [],
+                "author": post.user.username
+            }
+        })
+    except Post.DoesNotExist:
+        return JsonResponse({
+            "message": "Post does not exist!",
+        }, status=404)
+        
+        
 @login_required
 def create_comment(request):
     pass

@@ -3,11 +3,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const postsPerPage = 10;
     let loadMorePosts = false;
     let allPostsLoaded = false;
+
+    function createEditDeleteButtons(post, user) {
+        const editDeleteButtons = document.createElement('div');
+        editDeleteButtons.className = 'edit-delete-buttons';
+
+        if (user.is_authenticated && user.username === post.author) {
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => {
+                
+            });
+           
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => {
+                
+            });
+
+            editDeleteButtons.appendChild(editButton);
+            editDeleteButtons.appendChild(deleteButton);
+        }
+
+        return editDeleteButtons;
+    }
     
     // Function to fetch and display all posts from server
     function fetchAndDisplayPosts(page) {
         if (loadMorePosts || allPostsLoaded) {
-            return;
+            return; 
         }
 
         loadMorePosts = true;
@@ -21,16 +46,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 data.posts.forEach(post => {
                     const postItem = document.createElement('div');
+                    const editDeleteButtons = createEditDeleteButtons(post, data.user);
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
+                        ${editDeleteButtons.outerHTML}
                         <p>${post.text}</p>
                         <p>${post.timestamp}</p>
                         <div class="likes-comments">
                             <p>Liked by: ${post.liked_by.join(', ')}</p>
                             <p>Comments: ${post.comments.length}</p>
                         </div>
-
                     `;
                     postList.appendChild(postItem);
                 });
@@ -101,5 +127,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }); 
 
     fetchAndDisplayPosts(currentPage);
-    
 });
