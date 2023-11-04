@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block body %}
-    
+     
     <section id="posts">
         <div id="posts-container">
             
@@ -22,6 +22,16 @@
             {% endif %}
             
             <div id="post-list">
+                <div id="post-item">
+                    {% if user.is_authenticated %}
+                        {% if user == post.author %}
+                        <div class="edit-post" hidden>
+                            <textarea id="edit-textarea" rows="3">{{ post.text }}</textarea>
+                            <button id="save-button">Save</button>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
             
         </div>
