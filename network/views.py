@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
@@ -83,15 +84,20 @@ def new_post(request):
     post.save()
     
     formatted_timestamp = post.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S")
+    
+    new_post_data = {
+        'id': post.id,
+        'text': post.body,
+        'timestamp': post.formatted_timestamp(),
+        'author': user.username,
+        'comments': [],
+        'liked_by': [],
+        'is_author': True,
+    }
+    
     return JsonResponse({
         "message": "Post created successfully!",
-        "post": {
-            "user": user.username,
-            "body": body,
-            "timestamp": formatted_timestamp,
-            "liked_by": [],
-            "comments": []
-        }
+        "post": new_post_data
     })
     
     
@@ -117,6 +123,9 @@ def get_posts(request):
                 'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
                 'author': comment.user.username,
             })
+            
+        is_author = post.user == request.user
+        
         post_data.append({
             'id': post.id,
             'text': post.body,
@@ -124,6 +133,7 @@ def get_posts(request):
             'author': post.user.username,
             'comments': comments,
             'liked_by': [user.username for user in post.liked_by.all()],
+            'is_author': is_author,
         })
     
     return JsonResponse({
@@ -153,6 +163,8 @@ def edit_post(request, post_id):
             }, status=403)
         post.body = edited_text
         post.save()
+        
+        is_author = post.user == request.user
         return JsonResponse({
             "message": "Post edited successfully!",
             "post": {
@@ -161,7 +173,8 @@ def edit_post(request, post_id):
                 "timestamp": post.formatted_timestamp(),
                 "liked_by": [user.username for user in post.liked_by.all()],
                 "comments": [],
-                "author": post.user.username
+                "author": post.user.username,
+                "is_author": is_author,
             }
         })
     except Post.DoesNotExist:
@@ -169,6 +182,26 @@ def edit_post(request, post_id):
             "message": "Post does not exist!",
         }, status=404)
         
+        
+@require_http_methods(["DELETE"])
+@login_required
+def delete_post(request, post_id):   
+    try:
+        post = Post.objects.get(id=post_id)
+        if post.user != request.user:
+            return JsonResponse({
+                "message": "You can only delete your own posts!",
+            }, status=403)
+        post.delete()
+        return JsonResponse({
+            "message": "Post deleted successfully!",
+        })
+    except Post.DoesNotExist:
+        return JsonResponse({
+            "message": "Post does not exist!",
+        }, status=404)
+
+
         
 @login_required
 def create_comment(request):

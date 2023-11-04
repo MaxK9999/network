@@ -22,12 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 data.posts.forEach(post => {
                     const postItem = document.createElement('div');
+                    const editButtonStyle = post.is_author ? 'display: inline;' : 'display: none;'; 
+                    const deleteButtonStyle = post.is_author ? 'display: inline;' : 'display: none;';
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
-                        <button class="edit-button">Edit</button>
+                        <button class="edit-button" style="${editButtonStyle}">Edit</button>
                         <button class="save-button" style="display: none;">Save</button>
-                        <button class="delete-button">Delete</button>
+                        <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
                         <div class="post-text">
                             <p data-post-id="${post.id}">${post.text}</p>
                         </div>
@@ -94,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.message === 'Post edited successfully!') {
-                postContent.querySelector('p').textContent = editedText;
+                postContent.textContent = editedText;
                 handleEditPost(postItem);
             }
         })
@@ -111,6 +113,34 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (target.classList.contains('save-button')) {
             const postItem = target.closest('.post-item');
             handleSavePost(postItem);
+        }
+    });
+
+    function handleDeletePost(postItem) {
+        const postId = postItem.querySelector('.post-text p').dataset.postId;
+
+        fetch(`/delete_post/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),	
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Post deleted successfully!') {
+                postItem.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting post:', error);
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.classList.contains('delete-button')) {
+            const postItem = target.closest('.post-item');
+            handleDeletePost(postItem);
         }
     });
 
@@ -166,14 +196,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.message === 'Post created successfully!') {
                     const postList = document.getElementById('post-list');
                     const postItem = document.createElement('div');
+                    const editButtonStyle = data.post.is_author ? 'display: inline;' : 'display: none;';
+                    const deleteButtonStyle = data.post.is_author ? 'display: inline;' : 'display: none;';
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
-                        <p class="post-author"><strong>${data.post.user}</strong></p>
-                        <p>${data.post.body}</p>
+                        <p class="post-author"><strong><a href="/profile_page/${data.post.author}">${data.post.author}</a></strong></p>
+                        <button class="edit-button" style="${editButtonStyle}">Edit</button>
+                        <button class="save-button" style="display: none;">Save</button>
+                        <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
+                        <div class="post-text">
+                            <p data-post-id="${data.post.id}">${data.post.text}</p>
+                        </div>
                         <p>${data.post.timestamp}</p>
-                        <div class="likes-comments">        
+                        <div class="likes-comments">
                             <p>Liked by: ${data.post.liked_by.join(', ')}</p>
-                            <p>Comments: ${data.post.comments}</p>
+                            <p>Comments: ${data.post.comments.length}</p>
                         </div>
                     `;
                     postList.insertBefore(postItem, postList.firstChild);
