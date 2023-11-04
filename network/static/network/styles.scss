@@ -142,6 +142,72 @@ body {
                     }
                 }
             }
+
+            .edit-post {
+                margin-left: -10px;
+                padding: 10px;
+
+                .edit-button {
+                    border-radius: 16px;
+                    border: 1px solid rgba(139, 139, 139, 0.867);
+                    padding: 0 10px 0;
+                    height: 30px;
+                    width: -moz-fit-content;
+                    transition: all 0.4s ease;
+                    outline: none;
+                    box-shadow: none;
+
+                    &:hover {
+                        background-color: rgba(59, 235, 255, 0.827);
+                        transform: scale(1.1);
+                    }
+                }
+
+                .save-button {
+                    border-radius: 16px;
+                    border: 1px solid rgba(139, 139, 139, 0.867);
+                    padding: 0 10px 0;
+                    height: 30px;
+                    width: -moz-fit-content;
+                    transition: all 0.4s ease;
+                    outline: none;
+                    box-shadow: none;
+
+                    &:hover {
+                        background-color: rgba(59, 255, 134, 0.827);
+                        transform: scale(1.1);
+                    }
+                }
+
+                .delete-button {
+                    border-radius: 16px;
+                    border: 1px solid rgba(139, 139, 139, 0.867);
+                    padding: 0 10px 0;
+                    height: 30px;
+                    width: -moz-fit-content;
+                    transition: all 0.4s ease;
+                    outline: none;
+                    box-shadow: none;
+
+                    &:hover {
+                        background-color: rgba(241, 126, 126, 0.827);
+                        transform: scale(1.1);
+                    }
+                }
+            }
+
+            .post-text {
+                font-size: 15px;
+                font-family: Arial, Helvetica, sans-serif;
+                margin-bottom: 10px;
+                margin-top: 30px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 5;
+                -webkit-box-orient: vertical;
+            }
+
             .likes-comments {
                 margin-top: 15px;
                 display: flex;

@@ -27,9 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
-                        <button class="edit-button" style="${editButtonStyle}">Edit</button>
-                        <button class="save-button" style="display: none;">Save</button>
-                        <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
+                        <div class="edit-post">
+                            <button class="edit-button" style="${editButtonStyle}">Edit</button>
+                            <button class="save-button" style="display: none;">Save</button>
+                            <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
+                        </div>
                         <div class="post-text">
                             <p data-post-id="${post.id}">${post.text}</p>
                         </div>
@@ -201,9 +203,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${data.post.author}">${data.post.author}</a></strong></p>
-                        <button class="edit-button" style="${editButtonStyle}">Edit</button>
-                        <button class="save-button" style="display: none;">Save</button>
-                        <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
+                        <div class="edit-post">
+                            <button class="edit-button" style="${editButtonStyle}">Edit</button>
+                            <button class="save-button" style="display: none;">Save</button>
+                            <button class="delete-button" style="${deleteButtonStyle}">Delete</button>
+                        </div>
                         <div class="post-text">
                             <p data-post-id="${data.post.id}">${data.post.text}</p>
                         </div>
