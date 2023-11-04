@@ -4,31 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let loadMorePosts = false;
     let allPostsLoaded = false;
 
-    function createEditDeleteButtons(post, user) {
-        const editDeleteButtons = document.createElement('div');
-        editDeleteButtons.className = 'edit-delete-buttons';
 
-        if (user.is_authenticated && user.username === post.author) {
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
-            editButton.addEventListener('click', () => {
-                
-            });
-           
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () => {
-                
-            });
-
-            editDeleteButtons.appendChild(editButton);
-            editDeleteButtons.appendChild(deleteButton);
-        }
-
-        return editDeleteButtons;
-    }
-    
     // Function to fetch and display all posts from server
     function fetchAndDisplayPosts(page) {
         if (loadMorePosts || allPostsLoaded) {
@@ -46,12 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 data.posts.forEach(post => {
                     const postItem = document.createElement('div');
-                    const editDeleteButtons = createEditDeleteButtons(post, data.user);
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
-                        ${editDeleteButtons.outerHTML}
-                        <p>${post.text}</p>
+                        <button class="edit-button">Edit</button>
+                        <button class="save-button" style="display: none;">Save</button>
+                        <button class="delete-button">Delete</button>
+                        <div class="post-text">
+                            <p data-post-id="${post.id}">${post.text}</p>
+                        </div>
                         <p>${post.timestamp}</p>
                         <div class="likes-comments">
                             <p>Liked by: ${post.liked_by.join(', ')}</p>
@@ -77,6 +56,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingText.textContent = '';
             });
     }   
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function handleEditPost(postItem) {
+        const editButton = postItem.querySelector('.edit-button');
+        const saveButton = postItem.querySelector('.save-button');
+        const postContent = postItem.querySelector('.post-text');
+        const originalText = postContent.textContent;
+
+        if (editButton.textContent === 'Edit') {
+            editButton.textContent = 'Cancel';
+            saveButton.style.display = 'inline';
+            postContent.contentEditable = true;
+            postContent.focus();
+        } else {
+            editButton.textContent = 'Edit';
+            saveButton.style.display = 'none';
+            postContent.contentEditable = false;
+            postContent.textContent = originalText;
+        }
+    }
+
+    function handleSavePost(postItem) {
+        const postContent = postItem.querySelector('.post-text');
+        const postId = postContent.querySelector('p').dataset.postId;
+        const editedText = postContent.querySelector('p').textContent;
+
+        fetch(`/edit_post/${postId}`, {
+            method: 'POST',
+            body: JSON.stringify({ text: editedText }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),	
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Post edited successfully!') {
+                postContent.querySelector('p').textContent = editedText;
+                handleEditPost(postItem);
+            }
+        })
+        .catch(error => {
+            console.error('Error editing post:', error);
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.classList.contains('edit-button')) {
+            const postItem = target.closest('.post-item');
+            handleEditPost(postItem);
+        } else if (target.classList.contains('save-button')) {
+            const postItem = target.closest('.post-item');
+            handleSavePost(postItem);
+        }
+    });
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + '=') {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
    
     let timeout;
     window.addEventListener('scroll', function() {
@@ -89,7 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
      
     fetchAndDisplayPosts(currentPage);
+    	
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Form submission
     const postForm = document.getElementById('post-form');
     postForm.addEventListener('submit', function(event) {

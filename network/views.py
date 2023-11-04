@@ -136,14 +136,14 @@ def get_posts(request):
 
     
 @login_required
-def edit_post(request):
+def edit_post(request, post_id):
     if request.method != "POST":
         return JsonResponse({
             "message": "Request method must be POST!"
         }, status=405)
     
-    post_id = request.POST.get("post_id")
-    edited_text = request.POST.get("edited_text")
+    data = json.loads(request.body)
+    edited_text = data.get("text")
     
     try:
         post = Post.objects.get(id=post_id)
