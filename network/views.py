@@ -236,12 +236,15 @@ def follow(request, username):
         current_user = request.user
         target_user = User.objects.get(username=username)
 
-        if target_user.is_followed_by(current_user):
-            Follower.objects.filter(user_from=current_user, user_to=target_user).delete()
-            message = 'Unfollowed'
+        if target_user != current_user:
+            if target_user.is_followed_by(current_user):
+                Follower.objects.filter(user_from=current_user, user_to=target_user).delete()
+                message = 'Unfollowed'
+            else:
+                Follower(user_from=current_user, user_to=target_user).save()
+                message = 'Followed'
         else:
-            Follower(user_from=current_user, user_to=target_user).save()
-            message = 'Followed'
+            message = 'You cannot follow yourself'
         
         return JsonResponse({
             'message': message,
