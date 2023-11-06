@@ -7,22 +7,15 @@
 
         <div id="profile">
             <h2>{{ username }}</h2>
-            {% if user.is_authenticated %}
-                {% if username != current_user %}
-                <form action="{% url 'follow' username %}" id="follow-form" method="POST">
-                    {% csrf_token %}
-                    {% if is_followed %}
-                        <button id="follow-button" class="unfollow">Unfollow</button>
-                    {% else %}
-                        <button id="follow-button" class="follow">Follow</button>
-                    {% endif %}
-                </form>
-                {% endif %}
-            {% endif %}
+            <div id="follow-button-container" data-is-followed="{% if is_followed %}true{% else %}false{% endif %}">
+                <button id="follow-button" class="{% if is_followed %}unfollow{% else %}follow{% endif %}">
+                    {% if is_followed %}Unfollow{% else %}Follow{% endif %}
+                </button>
+            </div>
             <p>{{ bio }}</p>
             <div id="profile-details">
-                <p>Followers: {{ follower_count }}</p>
-                <p>Following: {{ following_count }}</p>
+                <p id="follower-count">Followers: {{ follower_count }}</p>
+                <p id="following-count">Following: {{ following_count }}</p>
             </div>
         </div>
 
@@ -34,13 +27,60 @@
         </div>
 
         
-        
     </section>
 
     <div id="loading-text"></div>
     
 
     <script>
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+        }
+
+        const followButtonContainer = document.getElementById('follow-button-container');
+        const followButton = followButtonContainer.querySelector('#follow-button');
+        
+        followButton.addEventListener('click', () => {
+            const following = followButton.classList.contains('unfollow');
+            fetch(`/follow/${username}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ following: following }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Followed' || data.message === 'Unfollowed') {
+                    // Update the follow button
+                    followButton.classList.toggle('unfollow');
+                    followButton.classList.toggle('follow');
+                    followButton.textContent = data.message === 'Followed' ? 'Unfollow' : 'Follow';
+        
+                    // Update the follower and following counts
+                    const followerCountElement = document.querySelector('#follower-count');
+                    const followingCountElement = document.querySelector('#following-count');
+        
+                    if (following) {
+                        // If following, decrement follower count
+                        followerCountElement.textContent = parseInt(followerCountElement.textContent) - 1;
+                    } else {
+                        // If unfollowing, increment follower count
+                        followerCountElement.textContent = parseInt(followerCountElement.textContent) + 1;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error following:', error);
+            });
+        });
+        
 
         let currentPage = 1;
         const postsPerPage = 10;
@@ -104,6 +144,7 @@
     
         const username = "{{ username }}";
         fetchUserPosts(username, currentPage);
+
     </script>
 
 {% endblock  %}

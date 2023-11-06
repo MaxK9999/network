@@ -1,3 +1,4 @@
+from email import message
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -237,10 +238,14 @@ def follow(request, username):
 
         if target_user.is_followed_by(current_user):
             Follower.objects.filter(user_from=current_user, user_to=target_user).delete()
+            message = 'Unfollowed'
         else:
             Follower(user_from=current_user, user_to=target_user).save()
-            
-    return redirect('profile_page', username)
+            message = 'Followed'
+        
+        return JsonResponse({
+            'message': message,
+        })
 
 
 @login_required
