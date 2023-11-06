@@ -331,3 +331,24 @@ def get_user_posts(request, username):
         'posts': post_data
     }, safe=True)
 
+
+@login_required 
+def like_posts(request, post_id):
+    if request.method != "POST":
+        return JsonResponse({
+            "message": "Request method must be POST!"
+        }, status=405)
+    
+    post = Post.objects.get(id=post_id)
+    current_user = request.user
+    
+    if current_user in post.liked_by.all():
+        post.liked_by.remove(current_user)
+        message = 'Unliked'
+    else:
+        post.liked_by.add(current_user)
+        message = 'Liked'
+    
+    return JsonResponse({
+        "message": message,
+    })
