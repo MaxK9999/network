@@ -1,4 +1,3 @@
-from email import message
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -7,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
@@ -290,9 +289,12 @@ def following_posts(request):
                 'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
                 'author': comment.user.username,
             })
+            
+        image_url = post.image.url if post.image else None
         post_data.append({
             'id': post.id,
             'text': post.body,
+            'image': image_url,
             'timestamp': post.formatted_timestamp(),
             'author': post.user.username,
             'comments': comments,
@@ -322,9 +324,12 @@ def get_user_posts(request, username):
                 'timestamp': comment.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S"),
                 'author': comment.user.username,
             })
+            
+        image_url = post.image.url if post.image else None
         post_data.append({
             'id': post.id,
             'text': post.body,
+            'image': image_url,
             'timestamp': post.formatted_timestamp(),
             'author': post.user.username,
             'comments': comments,

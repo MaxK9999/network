@@ -117,6 +117,10 @@ body #posts-container #post-list .post-item {
   max-height: fit-content;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.589);
+  transition: all 0.4s ease;
+}
+body #posts-container #post-list .post-item:hover {
+  background-color: rgba(44, 44, 44, 0.568);
 }
 body #posts-container #post-list .post-author {
   font-size: 30px;
@@ -189,9 +193,9 @@ body #posts-container #post-list .post-text {
 }
 body #posts-container #post-list .post-text .post-image {
   width: 60%;
-  height: 300px;
-  -o-object-fit: cover;
-     object-fit: cover;
+  height: 400px;
+  -o-object-fit: contain;
+     object-fit: contain;
   border-radius: 10px;
   margin-bottom: 10px;
   margin-top: 10px;

@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const postItem = document.createElement('div');
                     const editButtonStyle = post.is_author ? 'display: inline;' : 'display: none;'; 
                     const deleteButtonStyle = post.is_author ? 'display: inline;' : 'display: none;';
+                    const likeButtonStyle = !post.is_author ? '' : 'display: none;';    
                     postItem.className = 'post-item';
                     postItem.innerHTML = `
                         <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
@@ -35,10 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="post-text">
                             <p data-post-id="${post.id}">${post.text}</p>
                             ${post.image ? `<img src="${post.image}" class="post-image" alt="Post image">` : ''}
-                        </div>
+                        </div> 
                         <p>${post.timestamp}</p>
                         <div class="likes-comments">
-                            <p>Liked by: ${post.liked_by.join(', ')}</p>
+                            <p>Liked by: <span id="like-count-${post.id}">${post.liked_by.length}</span></p>
+                            <button class="like-button" style="${likeButtonStyle}" data-post-id="${post.id}">Like</button>
                             <p>Comments: ${post.comments.length}</p>
                         </div>
                     `;
@@ -83,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     function handleSavePost(postItem) {
         const postContent = postItem.querySelector('.post-text');
         const postId = postContent.querySelector('p').dataset.postId;
@@ -119,6 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function handleDeletePost(postItem) {
         const postId = postItem.querySelector('.post-text p').dataset.postId;
 
@@ -146,6 +152,43 @@ document.addEventListener('DOMContentLoaded', function() {
             handleDeletePost(postItem);
         }
     });
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Function to handle like button click
+    function handleLikeButton(event) {
+        if (event.target.classList.contains('like-button')) {
+            const postId = event.target.getAttribute('data-post-id');
+            const likeButton = event.target;
+            const likeCountElement = document.getElementById(`like-count-${postId}`);
+            const isLiked = likeButton.classList.contains('liked');
+
+            fetch(`/like_posts/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Liked') {
+                        likeButton.classList.add('liked');
+                        likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+                        likeButton.innerHTML = 'Dislike';
+                    } else if (data.message === 'Unliked') {
+                        likeButton.classList.remove('liked');
+                        likeCountElement.textContent = parseInt(likeCountElement.textContent) - 1;
+                        likeButton.innerHTML = 'Like';
+                    }
+                })   
+                .catch(error => {
+                    console.error('Error liking post:', error);
+                });
+        }
+    }
+
+    document.getElementById('post-list').addEventListener('click', handleLikeButton);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

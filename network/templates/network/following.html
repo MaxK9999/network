@@ -15,12 +15,10 @@
             </div>
         </div>
 
-        
-
-
     </section>
 
     <div id="loading-text"></div>
+
 
 
 
@@ -50,7 +48,10 @@
                         postItem.className = 'post-item';
                         postItem.innerHTML = `
                             <p class="post-author"><strong><a href="/profile_page/${post.author}">${post.author}</a></strong></p>
-                            <p>${post.text}</p>
+                            <div class="post-text">
+                                <p data-post-id="${post.id}">${post.text}</p>
+                                ${post.image ? `<img src="${post.image}" class="post-image" alt="Post image">` : ''}
+                            </div>
                             <p>${post.timestamp}</p>
                             <div class="likes-comments">
                                 <p>Liked by: ${post.liked_by.join(', ')}</p>
