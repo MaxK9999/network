@@ -39,7 +39,7 @@ class Comment(models.Model):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
     body = models.TextField(max_length=500, blank=False)
-    image = models.ImageField(upload_to='post_images/', null=True, blank=True)  # Still working on this/ Not suitable for implementing yet
+    image = models.ImageField(upload_to='post_images/', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(User, related_name="liked_posts", blank=True)
     comments = models.ManyToManyField(Comment, related_name="post_comments", blank=True)

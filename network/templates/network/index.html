@@ -13,7 +13,7 @@
                     {% csrf_token %}
                     <textarea name="body" id="post-content" rows="1" cols="10" required></textarea><br>
                     <label for="post-image" class="custom-file-upload">
-                        <input type="file" id="post-image" accept="image/*">
+                        <input type="file" name="image" id="post-image" accept="image/*">
                         <i class="fa-regular fa-file-image fa-xl"></i>
                     </label>
                     <button id="post-button">Post</button>

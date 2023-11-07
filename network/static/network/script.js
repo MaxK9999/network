@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="post-text">
                             <p data-post-id="${post.id}">${post.text}</p>
+                            <img class="post-image" src="${post.image}" alt="Post image">
                         </div>
                         <p>${post.timestamp}</p>
                         <div class="likes-comments">
@@ -210,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="post-text">
                             <p data-post-id="${data.post.id}">${data.post.text}</p>
+                            <img class="post-image" src="${data.post.image}" alt="Post image">
                         </div>
                         <p>${data.post.timestamp}</p>
                         <div class="likes-comments">

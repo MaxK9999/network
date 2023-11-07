@@ -206,6 +206,16 @@ body {
                 display: -webkit-box;
                 -webkit-line-clamp: 5;
                 -webkit-box-orient: vertical;
+
+                .post-image {
+                    width: 60%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                    margin-top: 10px;
+
+                }
             }
 
             .likes-comments {

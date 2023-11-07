@@ -80,8 +80,9 @@ def new_post(request):
     
     user = request.user
     body = request.POST.get("body")
+    image = request.FILES.get("image")
     
-    post = Post(user=user, body=body)
+    post = Post(user=user, body=body, image=image)
     post.save()
     
     formatted_timestamp = post.timestamp.astimezone(timezone.get_current_timezone()).strftime("%d-%m-%Y %H:%M:%S")
@@ -89,6 +90,7 @@ def new_post(request):
     new_post_data = {
         'id': post.id,
         'text': post.body,
+        'image': post.image.url if post.image else None,
         'timestamp': post.formatted_timestamp(),
         'author': user.username,
         'comments': [],
@@ -126,10 +128,12 @@ def get_posts(request):
             })
             
         is_author = post.user == request.user
+        image_url = post.image.url if post.image else None
         
         post_data.append({
             'id': post.id,
             'text': post.body,
+            'image': image_url,
             'timestamp': post.formatted_timestamp(),
             'author': post.user.username,
             'comments': comments,
